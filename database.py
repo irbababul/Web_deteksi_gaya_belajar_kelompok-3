@@ -1,9 +1,9 @@
-import os
+# 'import os' sudah dihapus karena tidak dipakai lagi
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text, Float, LargeBinary, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
-import streamlit as st
+import streamlit as st # Ini SANGAT PENTING
 
 Base = declarative_base()
 
@@ -46,9 +46,17 @@ class HasilAnalisis(Base):
 
 @st.cache_resource
 def get_database_engine():
-    database_url = os.getenv('DATABASE_URL')
-    if not database_url:
-        raise ValueError("DATABASE_URL environment variable not found")
+    
+    # --- INI BAGIAN YANG DIUBAH ---
+    # Kita mengambil "Secrets" menggunakan cara Streamlit (st.secrets)
+    # BUKAN cara Replit (os.getenv)
+    try:
+        database_url = st.secrets["DATABASE_URL"]
+    except KeyError:
+        # Error ini akan muncul jika Anda lupa mengisi "Secrets" di Streamlit
+        raise ValueError("DATABASE_URL tidak ditemukan di Streamlit Secrets. Pastikan Anda sudah menambahkannya.")
+    # --- BATAS PERUBAHAN ---
+        
     engine = create_engine(database_url, pool_pre_ping=True)
     return engine
 
